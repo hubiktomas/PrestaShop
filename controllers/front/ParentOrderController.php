@@ -331,10 +331,12 @@ class ParentOrderControllerCore extends FrontController
 				true,
 				$cart_product_context);
 
+			// Compare prices agains some small number - smaller than compute precision
+			$epsilon = pow(10, -1 * _PS_PRICE_COMPUTE_PRECISION_ - 1);
 			if (Product::getTaxCalculationMethod())
-				$product['is_discounted'] = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_) != Tools::ps_round($product['price'], _PS_PRICE_COMPUTE_PRECISION_);
+				$product['is_discounted'] = abs($product['price_without_specific_price'] - Tools::ps_round($product['price'], _PS_PRICE_COMPUTE_PRECISION_)) > $epsilon;
 			else
-				$product['is_discounted'] = Tools::ps_round($product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_) != Tools::ps_round($product['price_wt'], _PS_PRICE_COMPUTE_PRECISION_);
+				$product['is_discounted'] = abs($product['price_without_specific_price'] - Tools::ps_round($product['price_wt'], _PS_PRICE_COMPUTE_PRECISION_)) > $epsilon;
 		}
 
 		// Get available cart rules and unset the cart rules already in the cart
